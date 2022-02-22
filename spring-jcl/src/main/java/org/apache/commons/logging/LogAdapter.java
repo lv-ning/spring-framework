@@ -16,9 +16,6 @@
 
 package org.apache.commons.logging;
 
-import java.io.Serializable;
-import java.util.logging.LogRecord;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.ExtendedLogger;
@@ -26,6 +23,9 @@ import org.apache.logging.log4j.spi.LoggerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
+
+import java.io.Serializable;
+import java.util.logging.LogRecord;
 
 /**
  * Spring's common JCL adapter behind {@link LogFactory} and {@link LogFactoryService}.
@@ -36,10 +36,13 @@ import org.slf4j.spi.LocationAwareLogger;
  */
 final class LogAdapter {
 
+	// log4j2.jar 包中的一个类
 	private static final String LOG4J_SPI = "org.apache.logging.log4j.spi.ExtendedLogger";
 
+	// log4j2 到 slf4j 的桥接器
 	private static final String LOG4J_SLF4J_PROVIDER = "org.apache.logging.slf4j.SLF4JProvider";
 
+	// slf4j 日志实现类
 	private static final String SLF4J_SPI = "org.slf4j.spi.LocationAwareLogger";
 
 	private static final String SLF4J_API = "org.slf4j.Logger";
@@ -48,27 +51,27 @@ final class LogAdapter {
 	private static final LogApi logApi;
 
 	static {
+		// log4j2.jar 包中的一个类
+		// 判断是否可以加载到
 		if (isPresent(LOG4J_SPI)) {
+			// 没有 log4j2 到 slf4j 桥接器  log4j-to-slf4j-2.0.2.jar
+			// 并且有 slf4j 才使用 slf4j
 			if (isPresent(LOG4J_SLF4J_PROVIDER) && isPresent(SLF4J_SPI)) {
 				// log4j-to-slf4j bridge -> we'll rather go with the SLF4J SPI;
 				// however, we still prefer Log4j over the plain SLF4J API since
 				// the latter does not have location awareness support.
 				logApi = LogApi.SLF4J_LAL;
-			}
-			else {
+			} else {
 				// Use Log4j 2.x directly, including location awareness support
 				logApi = LogApi.LOG4J;
 			}
-		}
-		else if (isPresent(SLF4J_SPI)) {
+		} else if (isPresent(SLF4J_SPI)) {
 			// Full SLF4J SPI including location awareness support
 			logApi = LogApi.SLF4J_LAL;
-		}
-		else if (isPresent(SLF4J_API)) {
+		} else if (isPresent(SLF4J_API)) {
 			// Minimal SLF4J API without location awareness support
 			logApi = LogApi.SLF4J;
-		}
-		else {
+		} else {
 			// java.util.logging as default
 			logApi = LogApi.JUL;
 		}
@@ -81,14 +84,18 @@ final class LogAdapter {
 
 	/**
 	 * Create an actual {@link Log} instance for the selected API.
+	 *
 	 * @param name the logger name
 	 */
 	public static Log createLog(String name) {
 		switch (logApi) {
+			// log4j
 			case LOG4J:
 				return Log4jAdapter.createLog(name);
+			// slf4j2
 			case SLF4J_LAL:
 				return Slf4jAdapter.createLocationAwareLog(name);
+			// slf4j
 			case SLF4J:
 				return Slf4jAdapter.createLog(name);
 			default:
@@ -98,6 +105,7 @@ final class LogAdapter {
 				// case of Log4j or SLF4J, we are trying to prevent early initialization
 				// of the JavaUtilLog adapter - e.g. by a JVM in debug mode - when eagerly
 				// trying to parse the bytecode for all the cases of this switch clause.
+				// jul
 				return JavaUtilAdapter.createLog(name);
 		}
 	}
@@ -106,8 +114,7 @@ final class LogAdapter {
 		try {
 			Class.forName(className, false, LogAdapter.class.getClassLoader());
 			return true;
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			return false;
 		}
 	}
@@ -261,12 +268,10 @@ final class LogAdapter {
 				// for message objects in case of "{}" sequences (SPR-16226)
 				if (exception != null) {
 					this.logger.logIfEnabled(FQCN, level, null, (String) message, exception);
-				}
-				else {
+				} else {
 					this.logger.logIfEnabled(FQCN, level, null, (String) message);
 				}
-			}
-			else {
+			} else {
 				this.logger.logIfEnabled(FQCN, level, null, message, exception);
 			}
 		}
@@ -604,8 +609,7 @@ final class LogAdapter {
 				LogRecord rec;
 				if (message instanceof LogRecord) {
 					rec = (LogRecord) message;
-				}
-				else {
+				} else {
 					rec = new LocationResolvingLogRecord(level, String.valueOf(message));
 					rec.setLoggerName(this.name);
 					rec.setResourceBundleName(this.logger.getResourceBundleName());
@@ -670,8 +674,7 @@ final class LogAdapter {
 				String className = element.getClassName();
 				if (FQCN.equals(className)) {
 					found = true;
-				}
-				else if (found) {
+				} else if (found) {
 					sourceClassName = className;
 					sourceMethodName = element.getMethodName();
 					break;
