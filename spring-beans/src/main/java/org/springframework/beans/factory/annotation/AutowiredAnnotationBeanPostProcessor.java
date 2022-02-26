@@ -630,12 +630,18 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			this.required = required;
 		}
 
+		/**
+		 * 字段 field 上面加 {@link Autowired} 注解后，执行的方法
+		 */
 		@Override
 		protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
+			// 获取当前字段
 			Field field = (Field) this.member;
 			Object value;
+			// 缓存中获取
 			if (this.cached) {
 				try {
+					// 缓存中拿到
 					value = resolvedCachedArgument(beanName, this.cachedFieldValue);
 				}
 				catch (NoSuchBeanDefinitionException ex) {
@@ -644,6 +650,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 				}
 			}
 			else {
+				// 拿到这个值
 				value = resolveFieldValue(field, bean, beanName);
 			}
 			if (value != null) {
