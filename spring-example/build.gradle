@@ -12,6 +12,20 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     optional(project(":spring-context"))
+    //主要是为了数据源  datasource
+    optional(project(":spring-jdbc"))
+
+    //log  输出
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
+    implementation 'org.projectlombok:lombok:1.18.22'
+
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.23'
+    //mybatis的核心依赖
+    implementation group: 'org.mybatis', name: 'mybatis', version: '3.5.5'
+    //mybatis和spring的插件包
+//    implementation group: 'org.mybatis', name: 'mybatis-spring', version: '1.2.5'
+    implementation group: 'org.mybatis', name: 'mybatis-spring', version: '2.0.5'
 
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'

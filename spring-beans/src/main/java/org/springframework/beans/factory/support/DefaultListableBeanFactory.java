@@ -1303,6 +1303,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						return null;
 					}
 				}
+				// 获取到该类（注意，这里不是实例化对象，因为有可能该类没有在 spring 容器中）
 				instanceCandidate = matchingBeans.get(autowiredBeanName);
 			}
 			else {
@@ -1402,6 +1403,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			Object result = converter.convertIfNecessary(matchingBeans.values(), type);
 			if (result instanceof List) {
 				if (((List<?>) result).size() > 1) {
+					// 排序 和 order 有关
 					Comparator<Object> comparator = adaptDependencyComparator(matchingBeans);
 					if (comparator != null) {
 						((List<?>) result).sort(comparator);
