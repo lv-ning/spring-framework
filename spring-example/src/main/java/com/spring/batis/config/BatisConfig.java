@@ -3,6 +3,7 @@ package com.spring.batis.config;
 import com.spring.batis.util.MyScan;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -17,7 +18,7 @@ import javax.sql.DataSource;
  */
 @ComponentScan(basePackages = "com.spring.batis")
 @MyScan// 自定义扫描来实现 mapper 的加载
-//@MapperScan(basePackages = "com.spring.batis.mapper")
+@MapperScan(basePackages = "com.spring.batis.mapper")
 //@ImportResource(value = "classpath:spring-batis.xml")
 public class BatisConfig {
 

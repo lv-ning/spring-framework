@@ -71,6 +71,7 @@ final class PostProcessorRegistrationDelegate {
 			// 存储所有字类 bean
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
+			// api 提供的
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					// 如果是字类方法

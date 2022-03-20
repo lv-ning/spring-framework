@@ -17,5 +17,7 @@ public class B implements BeanFactoryPostProcessor {
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		log.debug("b-p api parent postProcessBeanFactory");
+//		beanFactory.ignoreDependencyType();
+//		beanFactory.ignoreDependencyInterface();
 	}
 }
