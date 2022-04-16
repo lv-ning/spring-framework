@@ -15,4 +15,6 @@ import java.lang.annotation.*;
 @Documented
 @Import(MyImportBeanDefinitionRegistrar.class)
 public @interface MyScan {
+
+	String value();
 }

@@ -1,5 +1,6 @@
 package com.spring.batis.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -12,6 +13,7 @@ import java.util.Map;
  * @author nning_l@163.com
  * @since 2022-03-12
  */
+@Mapper
 public interface TMapper {
 
 	@Select("select * from t where id = #{id}")

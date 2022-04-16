@@ -125,6 +125,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @see FullyQualifiedAnnotationBeanNameGenerator
 	 */
 	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
+		// 设置自定义名字生成器
 		this.reader.setBeanNameGenerator(beanNameGenerator);
 		this.scanner.setBeanNameGenerator(beanNameGenerator);
 		getBeanFactory().registerSingleton(

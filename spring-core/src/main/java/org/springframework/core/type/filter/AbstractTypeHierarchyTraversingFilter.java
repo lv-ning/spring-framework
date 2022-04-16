@@ -62,11 +62,13 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 		if (matchSelf(metadataReader)) {
 			return true;
 		}
+		// 类名
 		ClassMetadata metadata = metadataReader.getClassMetadata();
 		if (matchClassName(metadata.getClassName())) {
 			return true;
 		}
 
+		// 是否考虑 @Inherited
 		if (this.considerInherited) {
 			String superClassName = metadata.getSuperClassName();
 			if (superClassName != null) {
@@ -94,6 +96,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 			}
 		}
 
+		// 是否考虑接口
 		if (this.considerInterfaces) {
 			for (String ifc : metadata.getInterfaceNames()) {
 				// Optimization to avoid creating ClassReader for super class
@@ -133,6 +136,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 	 * to perform matching.
 	 */
 	protected boolean matchSelf(MetadataReader metadataReader) {
+		// 需要重写，匹配自身的信息
 		return false;
 	}
 
