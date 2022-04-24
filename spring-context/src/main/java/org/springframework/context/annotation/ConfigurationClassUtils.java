@@ -91,6 +91,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		AnnotationMetadata metadata;
+		// 注解
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
@@ -100,6 +101,7 @@ abstract class ConfigurationClassUtils {
 			// Check already loaded Class if present...
 			// since we possibly can't even load the class file for this Class.
 			Class<?> beanClass = ((AbstractBeanDefinition) beanDef).getBeanClass();
+			// 过滤 5 个内置的配置类
 			if (BeanFactoryPostProcessor.class.isAssignableFrom(beanClass) ||
 					BeanPostProcessor.class.isAssignableFrom(beanClass) ||
 					AopInfrastructureBean.class.isAssignableFrom(beanClass) ||
@@ -123,10 +125,25 @@ abstract class ConfigurationClassUtils {
 		}
 
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
+		// 配置类的注解
+		/**
+		 * config == null 没有加 Configuration 注解
+		 * config != null 加了 Configuration 注解
+		 */
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
+			// 加了 Configuration 注解
+			// Configuration 注解里面的 proxyBeanMethods = true
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
 		else if (config != null || isConfigurationCandidate(metadata)) {
+			// 加了 Configuration 注解
+			// 获取加了其它4个注解
+			/**
+			 * Component
+			 * ComponentScan
+			 * Import
+			 * ImportResource
+			 */
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
 		else {
@@ -155,6 +172,13 @@ abstract class ConfigurationClassUtils {
 			return false;
 		}
 
+		/**
+		 * Component
+		 * ComponentScan
+		 * Import
+		 * ImportResource
+		 * 加了 这4个注解
+		 */
 		// Any of the typical annotations found?
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {
@@ -163,6 +187,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// Finally, let's look for @Bean methods...
+		// 加了 @Bean 方法
 		return hasBeanMethods(metadata);
 	}
 
