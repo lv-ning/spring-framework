@@ -4,6 +4,7 @@ import com.spring.ethancer.config.AppConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.io.support.ResourcePropertySource;
 
 /**
  * TODO
@@ -14,10 +15,15 @@ import org.springframework.core.env.ConfigurableEnvironment;
 public class EnhancerTest {
 
 	@Test
-	public void defaultTest() {
+	public void defaultTest() throws Exception {
 		AnnotationConfigApplicationContext context =
-				new AnnotationConfigApplicationContext(AppConfig.class);
+				new AnnotationConfigApplicationContext();
+		context.register(AppConfig.class);
 
-		ConfigurableEnvironment environment = context.getEnvironment();
+//		ConfigurableEnvironment environment = context.getEnvironment();
+//		ResourcePropertySource propertySource = new ResourcePropertySource("classpath:application.properties");
+//		environment.getPropertySources().addLast(propertySource);
+
+		context.refresh();
 	}
 }
