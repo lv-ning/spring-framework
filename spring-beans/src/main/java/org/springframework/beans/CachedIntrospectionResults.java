@@ -166,6 +166,7 @@ public final class CachedIntrospectionResults {
 	 * @throws BeansException in case of introspection failure
 	 */
 	static CachedIntrospectionResults forClass(Class<?> beanClass) throws BeansException {
+		// 缓存
 		CachedIntrospectionResults results = strongClassCache.get(beanClass);
 		if (results != null) {
 			return results;
@@ -271,6 +272,7 @@ public final class CachedIntrospectionResults {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Getting BeanInfo for class [" + beanClass.getName() + "]");
 			}
+			// BeanInfo
 			this.beanInfo = getBeanInfo(beanClass);
 
 			if (logger.isTraceEnabled()) {
