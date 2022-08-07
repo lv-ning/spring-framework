@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 事务传播特性
  *
+ * 默认回滚规则是 RuntimeException 或者 Error
+ *
  * @author nning_l@163.com
  * @since 2022-08-02
  */
