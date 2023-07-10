@@ -17,8 +17,8 @@ import javax.sql.DataSource;
  * @since 2022-03-12
  */
 @ComponentScan(basePackages = "com.spring.batis")
-@MyScan(value = "com.spring.batis.mapper")// 自定义扫描来实现 mapper 的加载
-//@MapperScan(basePackages = "com.spring.batis.mapper")
+//@MyScan(value = "com.spring.batis.mapper")// 自定义扫描来实现 mapper 的加载
+@MapperScan(basePackages = "com.spring.batis.mapper")
 //@ImportResource(value = "classpath:spring-batis.xml")
 public class BatisConfig {
 

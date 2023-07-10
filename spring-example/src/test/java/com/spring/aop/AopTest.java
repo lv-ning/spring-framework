@@ -1,11 +1,15 @@
 package com.spring.aop;
 
+import com.spring.aop.config.AopConfig;
 import com.spring.aop.davice.AfterAround;
 import com.spring.aop.davice.AudienceAround;
+import com.spring.aop.service.DeleteService;
 import com.spring.aop.service.IService;
+import com.spring.aop.service.UserService;
 import com.spring.aop.service.impl.AService;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * aop 测试
@@ -27,5 +31,20 @@ public class AopTest {
 
 		IService service = (IService) pf.getProxy();
 		service.m();
+	}
+
+	@Test
+	public void aopIntroductions() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		context.register(AopConfig.class);
+		context.refresh();
+
+		UserService bean = context.getBean(UserService.class);
+		bean.query();
+		bean.update();
+
+		// 不需要再这样手动调用了
+//		DeleteService deleteService = (DeleteService) context.getBean("userService");
+//		deleteService.delete();
 	}
 }

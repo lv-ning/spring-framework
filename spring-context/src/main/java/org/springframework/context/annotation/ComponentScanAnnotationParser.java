@@ -139,6 +139,7 @@ class ComponentScanAnnotationParser {
 		scanner.addExcludeFilter(new AbstractTypeHierarchyTraversingFilter(false, false) {
 			@Override
 			protected boolean matchClassName(String className) {
+				// 判断 配置类 是否等于 className
 				return declaringClass.equals(className);
 			}
 		});
