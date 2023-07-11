@@ -24,9 +24,10 @@ public class AfterAround implements MethodInterceptor {
 	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		log.debug("AfterAround before execute");
-		Object proceed = invocation.proceed();
-		log.debug("AfterAround after execute");
-		return proceed;
+		try {
+			return invocation.proceed();
+		} finally {
+			log.debug("after around");
+		}
 	}
 }

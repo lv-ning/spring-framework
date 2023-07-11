@@ -24,9 +24,13 @@ public class AudienceAround implements MethodInterceptor {
 	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		log.debug("before execute");
-		Object proceed = invocation.proceed();
-		log.debug("after execute");
-		return proceed;
+		try {
+			log.debug("audience before around");
+			Object proceed = invocation.proceed();
+			log.debug("audience after returning around");
+			return proceed;
+		} finally {
+			log.debug("audience after around");
+		}
 	}
 }

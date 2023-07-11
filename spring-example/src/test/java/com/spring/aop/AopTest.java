@@ -2,7 +2,9 @@ package com.spring.aop;
 
 import com.spring.aop.config.AopConfig;
 import com.spring.aop.davice.AfterAround;
+import com.spring.aop.davice.AfterReturningAround;
 import com.spring.aop.davice.AudienceAround;
+import com.spring.aop.davice.BeforeAround;
 import com.spring.aop.service.DeleteService;
 import com.spring.aop.service.IService;
 import com.spring.aop.service.UserService;
@@ -25,6 +27,8 @@ public class AopTest {
 		ProxyFactory pf = new ProxyFactory();
 
 		pf.addInterface(IService.class);// 设置接口，使用 jdk 动态代理
+		pf.addAdvice(new BeforeAround());
+		pf.addAdvice(new AfterReturningAround());
 		pf.addAdvice(new AudienceAround());// 设置通知
 		pf.addAdvice(new AfterAround());// 设置通知
 		pf.setTarget(new AService());// 目标对象
