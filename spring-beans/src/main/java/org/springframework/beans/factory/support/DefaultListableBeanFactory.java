@@ -1244,6 +1244,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				return shortcut;
 			}
 
+			// 获取依赖类型
 			Class<?> type = descriptor.getDependencyType();
 			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 			if (value != null) {
@@ -1266,6 +1267,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 
 			// 获取注入的 类型
+			// 是否支持多个注入，如果支持，那么就完成查找
 			Object multipleBeans = resolveMultipleBeans(descriptor, beanName, autowiredBeanNames, typeConverter);
 			/**
 			 * 这里 不等于 null 的可能性为，这个注入类型可能为：
@@ -1279,9 +1281,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				return multipleBeans;
 			}
 
+			// 到这里说明只能注入一个
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, type, descriptor);
+			// 如果一个都没找到
 			if (matchingBeans.isEmpty()) {
+				// 在 @Autowired 中 required 是否为 true
 				if (isRequired(descriptor)) {
+					// 抛出异常
 					raiseNoMatchingBeanFound(type, descriptor.getResolvableType(), descriptor);
 				}
 				return null;
@@ -1320,6 +1326,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				autowiredBeanNames.add(autowiredBeanName);
 			}
 			if (instanceCandidate instanceof Class) {
+				// 实例化
 				instanceCandidate = descriptor.resolveCandidate(autowiredBeanName, type, this);
 			}
 			Object result = instanceCandidate;
@@ -1393,6 +1400,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (elementType == null) {
 				return null;
 			}
+			// 根据类型查找
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, elementType,
 					new MultiElementDescriptor(descriptor));
 			if (matchingBeans.isEmpty()) {
