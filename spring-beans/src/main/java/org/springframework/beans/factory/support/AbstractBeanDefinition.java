@@ -175,9 +175,15 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private String factoryMethodName;
 
+	/**
+	 * 构造方法西悉尼
+	 */
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
 
+	/**
+	 * set 方法
+	 */
 	@Nullable
 	private MutablePropertyValues propertyValues;
 

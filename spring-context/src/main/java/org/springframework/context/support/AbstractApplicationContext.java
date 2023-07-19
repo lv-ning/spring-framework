@@ -227,6 +227,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Create a new AbstractApplicationContext with no parent.
 	 */
 	public AbstractApplicationContext() {
+		super();
 		this.resourcePatternResolver = getResourcePatternResolver();
 	}
 
@@ -517,12 +518,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
+			// 设置一些必要的属性，并且判断属性是否存在
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			// 获取到容器对象
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
+			// 准备一些工厂信息
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -549,6 +553,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				onRefresh();
 
 				// Check for listener beans and register them.
+				// 注册 bean 的监听器
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
@@ -633,6 +638,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void initPropertySources() {
 		// For subclasses: do nothing by default.
+		// 添加需要的必要参数
+//		getEnvironment().addActiveProfile("abc");
 	}
 
 	/**

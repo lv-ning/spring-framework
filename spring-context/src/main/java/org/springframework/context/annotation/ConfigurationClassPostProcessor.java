@@ -411,6 +411,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * @see ConfigurationClassEnhancer
 	 */
 	public void enhanceConfigurationClasses(ConfigurableListableBeanFactory beanFactory) {
+		// 存储 全 配置类信息
 		Map<String, AbstractBeanDefinition> configBeanDefs = new LinkedHashMap<>();
 		// beanFactory.getBeanDefinitionNames() 不止 6 个，因为已经完成了扫描
 		// 还会获取出来你扫描出来的那些 bean
@@ -439,8 +440,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				AbstractBeanDefinition abd = (AbstractBeanDefinition) beanDef;
 				if (!abd.hasBeanClass()) {
 					boolean liteConfigurationCandidateWithoutBeanMethods =
+							// lite
 							(ConfigurationClassUtils.CONFIGURATION_CLASS_LITE.equals(configClassAttr) &&
-								annotationMetadata != null && !ConfigurationClassUtils.hasBeanMethods(annotationMetadata));
+									// 元数据信息
+								annotationMetadata != null &&
+									// 不包含 @Bean 注解
+									!ConfigurationClassUtils.hasBeanMethods(annotationMetadata));
 					if (!liteConfigurationCandidateWithoutBeanMethods) {
 						try {
 							abd.resolveBeanClass(this.beanClassLoader);
