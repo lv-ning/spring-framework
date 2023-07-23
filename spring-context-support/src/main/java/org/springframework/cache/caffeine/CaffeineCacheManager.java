@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2020 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @author Stephane Nicoll
  * @author Sam Brannen
+ * @author Brian Clozel
  * @since 4.3
  * @see CaffeineCache
  */
@@ -109,7 +110,7 @@ public class CaffeineCacheManager implements CacheManager {
 	 * Set the Caffeine to use for building each individual
 	 * {@link CaffeineCache} instance.
 	 * @see #createNativeCaffeineCache
-	 * @see com.github.benmanes.caffeine.cache.Caffeine#build()
+	 * @see Caffeine#build()
 	 */
 	public void setCaffeine(Caffeine<Object, Object> caffeine) {
 		Assert.notNull(caffeine, "Caffeine must not be null");
@@ -120,7 +121,7 @@ public class CaffeineCacheManager implements CacheManager {
 	 * Set the {@link CaffeineSpec} to use for building each individual
 	 * {@link CaffeineCache} instance.
 	 * @see #createNativeCaffeineCache
-	 * @see com.github.benmanes.caffeine.cache.Caffeine#from(CaffeineSpec)
+	 * @see Caffeine#from(CaffeineSpec)
 	 */
 	public void setCaffeineSpec(CaffeineSpec caffeineSpec) {
 		doSetCaffeine(Caffeine.from(caffeineSpec));
@@ -131,7 +132,7 @@ public class CaffeineCacheManager implements CacheManager {
 	 * individual {@link CaffeineCache} instance. The given value needs to
 	 * comply with Caffeine's {@link CaffeineSpec} (see its javadoc).
 	 * @see #createNativeCaffeineCache
-	 * @see com.github.benmanes.caffeine.cache.Caffeine#from(String)
+	 * @see Caffeine#from(String)
 	 */
 	public void setCacheSpecification(String cacheSpecification) {
 		doSetCaffeine(Caffeine.from(cacheSpecification));
@@ -148,7 +149,7 @@ public class CaffeineCacheManager implements CacheManager {
 	 * Set the Caffeine CacheLoader to use for building each individual
 	 * {@link CaffeineCache} instance, turning it into a LoadingCache.
 	 * @see #createNativeCaffeineCache
-	 * @see com.github.benmanes.caffeine.cache.Caffeine#build(CacheLoader)
+	 * @see Caffeine#build(CacheLoader)
 	 * @see com.github.benmanes.caffeine.cache.LoadingCache
 	 */
 	public void setCacheLoader(CacheLoader<Object, Object> cacheLoader) {
@@ -188,8 +189,11 @@ public class CaffeineCacheManager implements CacheManager {
 	@Override
 	@Nullable
 	public Cache getCache(String name) {
-		return this.cacheMap.computeIfAbsent(name, cacheName ->
-				this.dynamic ? createCaffeineCache(cacheName) : null);
+		Cache cache = this.cacheMap.get(name);
+		if (cache == null && this.dynamic) {
+			cache = this.cacheMap.computeIfAbsent(name, this::createCaffeineCache);
+		}
+		return cache;
 	}
 
 

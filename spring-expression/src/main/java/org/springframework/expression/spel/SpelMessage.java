@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,9 +258,33 @@ public enum SpelMessage {
 	FLAWED_PATTERN(Kind.ERROR, 1073,
 			"Failed to efficiently evaluate pattern ''{0}'': consider redesigning it"),
 
-	/** @since 5.3.16 */
+	/** @since 5.3.17 */
 	EXCEPTION_COMPILING_EXPRESSION(Kind.ERROR, 1074,
-			"An exception occurred while compiling an expression");
+			"An exception occurred while compiling an expression"),
+
+	/** @since 5.3.17 */
+	MAX_ARRAY_ELEMENTS_THRESHOLD_EXCEEDED(Kind.ERROR, 1075,
+			"Array declares too many elements, exceeding the threshold of ''{0}''"),
+
+	/** @since 5.2.23 */
+	MAX_REPEATED_TEXT_SIZE_EXCEEDED(Kind.ERROR, 1076,
+			"Repeated text is too long, exceeding the threshold of ''{0}'' characters"),
+
+	/** @since 5.2.23 */
+	MAX_REGEX_LENGTH_EXCEEDED(Kind.ERROR, 1077,
+			"Regular expression is too long, exceeding the threshold of ''{0}'' characters"),
+
+	/** @since 5.2.24 */
+	MAX_CONCATENATED_STRING_LENGTH_EXCEEDED(Kind.ERROR, 1078,
+			"Concatenated string is too long, exceeding the threshold of ''{0}'' characters"),
+
+	/** @since 5.2.24 */
+	MAX_EXPRESSION_LENGTH_EXCEEDED(Kind.ERROR, 1079,
+			"SpEL expression is too long, exceeding the threshold of ''{0}'' characters"),
+
+	/** @since 5.2.24 */
+	VARIABLE_ASSIGNMENT_NOT_SUPPORTED(Kind.ERROR, 1080,
+			"Assignment to variable ''{0}'' is not supported");
 
 
 	private final Kind kind;
@@ -287,10 +311,8 @@ public enum SpelMessage {
 	public String formatMessage(Object... inserts) {
 		StringBuilder formattedMessage = new StringBuilder();
 		formattedMessage.append("EL").append(this.code);
-		switch (this.kind) {
-			case ERROR:
-				formattedMessage.append('E');
-				break;
+		if (this.kind == Kind.ERROR) {
+			formattedMessage.append('E');
 		}
 		formattedMessage.append(": ");
 		formattedMessage.append(MessageFormat.format(this.message, inserts));

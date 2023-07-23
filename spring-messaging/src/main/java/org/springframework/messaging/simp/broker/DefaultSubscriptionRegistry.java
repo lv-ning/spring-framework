@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ import org.springframework.util.StringUtils;
  * @author Rossen Stoyanchev
  * @author Sebastien Deleuze
  * @author Juergen Hoeller
+ * @author Sam Brannen
  * @since 4.0
  */
 public class DefaultSubscriptionRegistry extends AbstractSubscriptionRegistry {
@@ -121,11 +122,12 @@ public class DefaultSubscriptionRegistry extends AbstractSubscriptionRegistry {
 
 	/**
 	 * Configure the name of a header that a subscription message can have for
-	 * the purpose of filtering messages matched to the subscription. The header
-	 * value is expected to be a Spring EL boolean expression to be applied to
-	 * the headers of messages matched to the subscription.
+	 * the purpose of filtering messages matched to the subscription.
+	 * <p>The header value is expected to be a Spring Expression Language (SpEL)
+	 * boolean expression to be applied to the headers of messages matched to the
+	 * subscription.
 	 * <p>For example:
-	 * <pre>
+	 * <pre style="code">
 	 * headers.foo == 'bar'
 	 * </pre>
 	 * <p>By default this is set to "selector". You can set it to a different
@@ -138,8 +140,9 @@ public class DefaultSubscriptionRegistry extends AbstractSubscriptionRegistry {
 	}
 
 	/**
-	 * Return the name for the selector header name.
+	 * Return the name of the selector header.
 	 * @since 4.2
+	 * @see #setSelectorHeaderName(String)
 	 */
 	@Nullable
 	public String getSelectorHeaderName() {
@@ -474,9 +477,8 @@ public class DefaultSubscriptionRegistry extends AbstractSubscriptionRegistry {
 		}
 
 		@Override
-		public boolean equals(@Nullable Object other) {
-			return (this == other ||
-					(other instanceof Subscription && this.id.equals(((Subscription) other).id)));
+		public boolean equals(@Nullable Object obj) {
+			return (this == obj || (obj instanceof Subscription that && this.id.equals(that.id)));
 		}
 
 		@Override
@@ -507,8 +509,8 @@ public class DefaultSubscriptionRegistry extends AbstractSubscriptionRegistry {
 		@SuppressWarnings("rawtypes")
 		public TypedValue read(EvaluationContext context, @Nullable Object target, String name) {
 			Object value;
-			if (target instanceof Message) {
-				value = name.equals("headers") ? ((Message) target).getHeaders() : null;
+			if (target instanceof Message message) {
+				value = name.equals("headers") ? message.getHeaders() : null;
 			}
 			else if (target instanceof MessageHeaders headers) {
 				SimpMessageHeaderAccessor accessor =

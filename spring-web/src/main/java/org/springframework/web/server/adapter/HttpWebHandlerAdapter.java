@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.springframework.web.server.adapter;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -29,6 +27,7 @@ import org.springframework.core.NestedExceptionUtils;
 import org.springframework.core.log.LogFormatUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.codec.LoggingCodecSupport;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.server.reactive.HttpHandler;
@@ -69,9 +68,9 @@ public class HttpWebHandlerAdapter extends WebHandlerDecorator implements HttpHa
 	private static final String DISCONNECTED_CLIENT_LOG_CATEGORY =
 			"org.springframework.web.server.DisconnectedClient";
 
-	 // Similar declaration exists in AbstractSockJsSession..
-	private static final Set<String> DISCONNECTED_CLIENT_EXCEPTIONS = new HashSet<>(
-			Arrays.asList("AbortedException", "ClientAbortException", "EOFException", "EofException"));
+	 // Similar declaration exists in AbstractSockJsSession.
+	private static final Set<String> DISCONNECTED_CLIENT_EXCEPTIONS =
+			Set.of("AbortedException", "ClientAbortException", "EOFException", "EofException");
 
 
 	private static final Log logger = LogFactory.getLog(HttpWebHandlerAdapter.class);
@@ -248,6 +247,7 @@ public class HttpWebHandlerAdapter extends WebHandlerDecorator implements HttpHa
 		return getDelegate().handle(exchange)
 				.doOnSuccess(aVoid -> logResponse(exchange))
 				.onErrorResume(ex -> handleUnresolvedError(exchange, ex))
+				.then(exchange.cleanupMultipart())
 				.then(Mono.defer(response::setComplete));
 	}
 
@@ -270,7 +270,7 @@ public class HttpWebHandlerAdapter extends WebHandlerDecorator implements HttpHa
 
 	private void logResponse(ServerWebExchange exchange) {
 		LogFormatUtils.traceDebug(logger, traceOn -> {
-			HttpStatus status = exchange.getResponse().getStatusCode();
+			HttpStatusCode status = exchange.getResponse().getStatusCode();
 			return exchange.getLogPrefix() + "Completed " + (status != null ? status : "200 OK") +
 					(traceOn ? ", headers=" + formatHeaders(exchange.getResponse().getHeaders()) : "");
 		});

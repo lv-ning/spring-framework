@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,7 +192,12 @@ final class HierarchicalUriComponents extends UriComponents {
 			throw new IllegalStateException(
 					"The port contains a URI variable but has not been expanded yet: " + this.port);
 		}
-		return Integer.parseInt(this.port);
+		try {
+			return Integer.parseInt(this.port);
+		}
+		catch (NumberFormatException ex) {
+			throw new IllegalStateException("The port must be an integer: " + this.port);
+		}
 	}
 
 	@Override
@@ -533,7 +538,7 @@ final class HierarchicalUriComponents extends UriComponents {
 		if (getHost() != null) {
 			builder.host(getHost());
 		}
-		// Avoid parsing the port, may have URI variable..
+		// Avoid parsing the port, may have URI variable.
 		if (this.port != null) {
 			builder.port(this.port);
 		}
@@ -549,19 +554,14 @@ final class HierarchicalUriComponents extends UriComponents {
 
 	@Override
 	public boolean equals(@Nullable Object other) {
-		if (this == other) {
-			return true;
-		}
-		if (!(other instanceof HierarchicalUriComponents otherComp)) {
-			return false;
-		}
-		return (ObjectUtils.nullSafeEquals(getScheme(), otherComp.getScheme()) &&
-				ObjectUtils.nullSafeEquals(getUserInfo(), otherComp.getUserInfo()) &&
-				ObjectUtils.nullSafeEquals(getHost(), otherComp.getHost()) &&
-				getPort() == otherComp.getPort() &&
-				this.path.equals(otherComp.path) &&
-				this.queryParams.equals(otherComp.queryParams) &&
-				ObjectUtils.nullSafeEquals(getFragment(), otherComp.getFragment()));
+		return (this == other || (other instanceof HierarchicalUriComponents that &&
+				ObjectUtils.nullSafeEquals(getScheme(), that.getScheme()) &&
+				ObjectUtils.nullSafeEquals(getUserInfo(), that.getUserInfo()) &&
+				ObjectUtils.nullSafeEquals(getHost(), that.getHost()) &&
+				getPort() == that.getPort() &&
+				this.path.equals(that.path) &&
+				this.queryParams.equals(that.queryParams) &&
+				ObjectUtils.nullSafeEquals(getFragment(), that.getFragment())));
 	}
 
 	@Override
@@ -944,7 +944,7 @@ final class HierarchicalUriComponents extends UriComponents {
 
 		public PathSegmentComponent(List<String> pathSegments) {
 			Assert.notNull(pathSegments, "List must not be null");
-			this.pathSegments = Collections.unmodifiableList(new ArrayList<>(pathSegments));
+			this.pathSegments = List.copyOf(pathSegments);
 		}
 
 		@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2020 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.web.util.pattern;
 
 import org.springframework.http.server.PathContainer;
+import org.springframework.util.StringUtils;
 
 /**
  * Parser for URI path patterns producing {@link PathPattern} instances that can
@@ -34,7 +35,7 @@ import org.springframework.http.server.PathContainer;
  */
 public class PathPatternParser {
 
-	private boolean matchOptionalTrailingSeparator = true;
+	private boolean matchOptionalTrailingSeparator = false;
 
 	private boolean caseSensitive = true;
 
@@ -48,15 +49,22 @@ public class PathPatternParser {
 	 * will also match request paths with a trailing slash. If set to
 	 * {@code false} a {@code PathPattern} will only match request paths with
 	 * a trailing slash.
-	 * <p>The default is {@code true}.
+	 * <p>The default was changed in 6.0 from {@code true} to {@code false} in
+	 * order to support the deprecation of the property.
+	 * @deprecated transparent support for trailing slashes is deprecated as of
+	 * 6.0 in favor of configuring explicit redirects through a proxy,
+	 * Servlet/web filter, or a controller.
 	 */
+	@Deprecated(since = "6.0")
 	public void setMatchOptionalTrailingSeparator(boolean matchOptionalTrailingSeparator) {
 		this.matchOptionalTrailingSeparator = matchOptionalTrailingSeparator;
 	}
 
 	/**
 	 * Whether optional trailing slashing match is enabled.
+	 * @deprecated as of 6.0 together with {@link #setMatchOptionalTrailingSeparator(boolean)}.
 	 */
+	@Deprecated(since = "6.0")
 	public boolean isMatchOptionalTrailingSeparator() {
 		return this.matchOptionalTrailingSeparator;
 	}
@@ -97,6 +105,17 @@ public class PathPatternParser {
 
 
 	/**
+	 * Prepare the given pattern for use in matching to full URL paths.
+	 * <p>By default, prepend a leading slash if needed for non-empty patterns.
+	 * @param pattern the pattern to initialize
+	 * @return the updated pattern
+	 * @since 5.2.25
+	 */
+	public String initFullPathPattern(String pattern) {
+		return (StringUtils.hasLength(pattern) && !pattern.startsWith("/") ? "/" + pattern : pattern);
+	}
+
+	/**
 	 * Process the path pattern content, a character at a time, breaking it into
 	 * path elements around separator boundaries and verifying the structure at each
 	 * stage. Produces a PathPattern object that can be used for fast matching
@@ -121,6 +140,7 @@ public class PathPatternParser {
 	 */
 	public final static PathPatternParser defaultInstance = new PathPatternParser() {
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void setMatchOptionalTrailingSeparator(boolean matchOptionalTrailingSeparator) {
 			raiseError();

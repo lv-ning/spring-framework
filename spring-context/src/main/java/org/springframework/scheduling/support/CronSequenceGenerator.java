@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ import org.springframework.util.StringUtils;
  * @see CronTrigger
  * @deprecated as of 5.3, in favor of {@link CronExpression}
  */
-@Deprecated
+@Deprecated(since = "5.3", forRemoval = true)
 public class CronSequenceGenerator {
 
 	private final String expression;
@@ -84,7 +84,7 @@ public class CronSequenceGenerator {
 	 * @see java.util.TimeZone#getDefault()
 	 * @deprecated as of 5.3, in favor of {@link CronExpression#parse(String)}
 	 */
-	@Deprecated
+	@Deprecated(since = "5.3", forRemoval = true)
 	public CronSequenceGenerator(String expression) {
 		this(expression, TimeZone.getDefault());
 	}
@@ -298,7 +298,7 @@ public class CronSequenceGenerator {
 	}
 
 	/**
-	 * Replace the values in the comma-separated list (case insensitive)
+	 * Replace the values in the comma-separated list (case-insensitive)
 	 * with their index in the list.
 	 * @return a new String with the values from the list replaced
 	 */
@@ -435,15 +435,10 @@ public class CronSequenceGenerator {
 
 	@Override
 	public boolean equals(@Nullable Object other) {
-		if (this == other) {
-			return true;
-		}
-		if (!(other instanceof CronSequenceGenerator otherCron)) {
-			return false;
-		}
-		return (this.months.equals(otherCron.months) && this.daysOfMonth.equals(otherCron.daysOfMonth) &&
-				this.daysOfWeek.equals(otherCron.daysOfWeek) && this.hours.equals(otherCron.hours) &&
-				this.minutes.equals(otherCron.minutes) && this.seconds.equals(otherCron.seconds));
+		return (this == other || (other instanceof CronSequenceGenerator that &&
+				this.months.equals(that.months) && this.daysOfMonth.equals(that.daysOfMonth) &&
+				this.daysOfWeek.equals(that.daysOfWeek) && this.hours.equals(that.hours) &&
+				this.minutes.equals(that.minutes) && this.seconds.equals(that.seconds)));
 	}
 
 	@Override

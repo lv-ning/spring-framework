@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ import org.springframework.util.concurrent.ListenableFuture;
  * @see DefaultManagedTaskExecutor
  * @see ThreadPoolTaskExecutor
  */
+@SuppressWarnings("deprecation")
 public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, SchedulingTaskExecutor {
 
 	@Nullable
@@ -82,6 +83,9 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 	private Executor concurrentExecutor;
 
 	private TaskExecutorAdapter adaptedExecutor;
+
+	@Nullable
+	private TaskDecorator taskDecorator;
 
 
 	/**
@@ -138,6 +142,7 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 	 * @since 4.3
 	 */
 	public final void setTaskDecorator(TaskDecorator taskDecorator) {
+		this.taskDecorator = taskDecorator;
 		this.adaptedExecutor.setTaskDecorator(taskDecorator);
 	}
 
@@ -174,11 +179,15 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 	}
 
 
-	private static TaskExecutorAdapter getAdaptedExecutor(Executor concurrentExecutor) {
+	private TaskExecutorAdapter getAdaptedExecutor(Executor concurrentExecutor) {
 		if (managedExecutorServiceClass != null && managedExecutorServiceClass.isInstance(concurrentExecutor)) {
 			return new ManagedTaskExecutorAdapter(concurrentExecutor);
 		}
-		return new TaskExecutorAdapter(concurrentExecutor);
+		TaskExecutorAdapter adapter = new TaskExecutorAdapter(concurrentExecutor);
+		if (this.taskDecorator != null) {
+			adapter.setTaskDecorator(this.taskDecorator);
+		}
+		return adapter;
 	}
 
 
@@ -230,10 +239,10 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 
 		public static Runnable buildManagedTask(Runnable task, String identityName) {
 			Map<String, String> properties;
-			if (task instanceof SchedulingAwareRunnable) {
+			if (task instanceof SchedulingAwareRunnable schedulingAwareRunnable) {
 				properties = new HashMap<>(4);
 				properties.put(ManagedTask.LONGRUNNING_HINT,
-						Boolean.toString(((SchedulingAwareRunnable) task).isLongLived()));
+						Boolean.toString(schedulingAwareRunnable.isLongLived()));
 			}
 			else {
 				properties = new HashMap<>(2);

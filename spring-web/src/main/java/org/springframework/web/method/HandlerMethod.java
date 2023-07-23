@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.SynthesizingMethodParameter;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -85,7 +85,7 @@ public class HandlerMethod {
 	private final MethodParameter[] parameters;
 
 	@Nullable
-	private HttpStatus responseStatus;
+	private HttpStatusCode responseStatus;
 
 	@Nullable
 	private String responseStatusReason;
@@ -108,7 +108,7 @@ public class HandlerMethod {
 
 	/**
 	 * Variant of {@link #HandlerMethod(Object, Method)} that
-	 * also accepts a {@link MessageSource} for use from sub-classes.
+	 * also accepts a {@link MessageSource} for use from subclasses.
 	 * @since 5.3.10
 	 */
 	protected HandlerMethod(Object bean, Method method, @Nullable MessageSource messageSource) {
@@ -218,6 +218,7 @@ public class HandlerMethod {
 		this.description = handlerMethod.description;
 	}
 
+
 	private MethodParameter[] initMethodParameters() {
 		int count = this.bridgedMethod.getParameterCount();
 		MethodParameter[] result = new MethodParameter[count];
@@ -248,7 +249,7 @@ public class HandlerMethod {
 		for (Class<?> paramType : method.getParameterTypes()) {
 			joiner.add(paramType.getSimpleName());
 		}
-		return beanType.getName() + "#" + method.getName() + joiner.toString();
+		return beanType.getName() + "#" + method.getName() + joiner;
 	}
 
 
@@ -277,7 +278,7 @@ public class HandlerMethod {
 
 	/**
 	 * If the bean method is a bridge method, this method returns the bridged
-	 * (user-defined) method. Otherwise it returns the same method as {@link #getMethod()}.
+	 * (user-defined) method. Otherwise, it returns the same method as {@link #getMethod()}.
 	 */
 	protected Method getBridgedMethod() {
 		return this.bridgedMethod;
@@ -296,7 +297,7 @@ public class HandlerMethod {
 	 * @see ResponseStatus#code()
 	 */
 	@Nullable
-	protected HttpStatus getResponseStatus() {
+	protected HttpStatusCode getResponseStatus() {
 		return this.responseStatus;
 	}
 
@@ -424,13 +425,8 @@ public class HandlerMethod {
 
 	@Override
 	public boolean equals(@Nullable Object other) {
-		if (this == other) {
-			return true;
-		}
-		if (!(other instanceof HandlerMethod otherMethod)) {
-			return false;
-		}
-		return (this.bean.equals(otherMethod.bean) && this.method.equals(otherMethod.method));
+		return (this == other || (other instanceof HandlerMethod otherMethod &&
+				this.bean.equals(otherMethod.bean) && this.method.equals(otherMethod.method)));
 	}
 
 	@Override
@@ -580,21 +576,21 @@ public class HandlerMethod {
 	private class ReturnValueMethodParameter extends HandlerMethodParameter {
 
 		@Nullable
-		private final Object returnValue;
+		private final Class<?> returnValueType;
 
 		public ReturnValueMethodParameter(@Nullable Object returnValue) {
 			super(-1);
-			this.returnValue = returnValue;
+			this.returnValueType = (returnValue != null ? returnValue.getClass() : null);
 		}
 
 		protected ReturnValueMethodParameter(ReturnValueMethodParameter original) {
 			super(original);
-			this.returnValue = original.returnValue;
+			this.returnValueType = original.returnValueType;
 		}
 
 		@Override
 		public Class<?> getParameterType() {
-			return (this.returnValue != null ? this.returnValue.getClass() : super.getParameterType());
+			return (this.returnValueType != null ? this.returnValueType : super.getParameterType());
 		}
 
 		@Override

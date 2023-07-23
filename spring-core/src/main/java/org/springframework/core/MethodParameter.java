@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,7 +195,7 @@ public class MethodParameter {
 	 */
 	@Nullable
 	public Method getMethod() {
-		return (this.executable instanceof Method ? (Method) this.executable : null);
+		return (this.executable instanceof Method method ? method : null);
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class MethodParameter {
 	 */
 	@Nullable
 	public Constructor<?> getConstructor() {
-		return (this.executable instanceof Constructor ? (Constructor<?>) this.executable : null);
+		return (this.executable instanceof Constructor<?> constructor ? constructor : null);
 	}
 
 	/**
@@ -552,20 +552,20 @@ public class MethodParameter {
 		if (this.nestingLevel > 1) {
 			Type type = getGenericParameterType();
 			for (int i = 2; i <= this.nestingLevel; i++) {
-				if (type instanceof ParameterizedType) {
-					Type[] args = ((ParameterizedType) type).getActualTypeArguments();
+				if (type instanceof ParameterizedType parameterizedType) {
+					Type[] args = parameterizedType.getActualTypeArguments();
 					Integer index = getTypeIndexForLevel(i);
 					type = args[index != null ? index : args.length - 1];
 				}
 				// TODO: Object.class if unresolvable
 			}
-			if (type instanceof Class) {
-				return (Class<?>) type;
+			if (type instanceof Class<?> clazz) {
+				return clazz;
 			}
-			else if (type instanceof ParameterizedType) {
-				Type arg = ((ParameterizedType) type).getRawType();
-				if (arg instanceof Class) {
-					return (Class<?>) arg;
+			else if (type instanceof ParameterizedType parameterizedType) {
+				Type arg = parameterizedType.getRawType();
+				if (arg instanceof Class<?> clazz) {
+					return clazz;
 				}
 			}
 			return Object.class;
@@ -585,8 +585,8 @@ public class MethodParameter {
 		if (this.nestingLevel > 1) {
 			Type type = getGenericParameterType();
 			for (int i = 2; i <= this.nestingLevel; i++) {
-				if (type instanceof ParameterizedType) {
-					Type[] args = ((ParameterizedType) type).getActualTypeArguments();
+				if (type instanceof ParameterizedType parameterizedType) {
+					Type[] args = parameterizedType.getActualTypeArguments();
 					Integer index = getTypeIndexForLevel(i);
 					type = args[index != null ? index : args.length - 1];
 				}
@@ -708,11 +708,11 @@ public class MethodParameter {
 		ParameterNameDiscoverer discoverer = this.parameterNameDiscoverer;
 		if (discoverer != null) {
 			String[] parameterNames = null;
-			if (this.executable instanceof Method) {
-				parameterNames = discoverer.getParameterNames((Method) this.executable);
+			if (this.executable instanceof Method method) {
+				parameterNames = discoverer.getParameterNames(method);
 			}
-			else if (this.executable instanceof Constructor) {
-				parameterNames = discoverer.getParameterNames((Constructor<?>) this.executable);
+			else if (this.executable instanceof Constructor<?> constructor) {
+				parameterNames = discoverer.getParameterNames(constructor);
 			}
 			if (parameterNames != null) {
 				this.parameterName = parameterNames[this.parameterIndex];
@@ -750,17 +750,12 @@ public class MethodParameter {
 
 	@Override
 	public boolean equals(@Nullable Object other) {
-		if (this == other) {
-			return true;
-		}
-		if (!(other instanceof MethodParameter otherParam)) {
-			return false;
-		}
-		return (getContainingClass() == otherParam.getContainingClass() &&
-				ObjectUtils.nullSafeEquals(this.typeIndexesPerLevel, otherParam.typeIndexesPerLevel) &&
-				this.nestingLevel == otherParam.nestingLevel &&
-				this.parameterIndex == otherParam.parameterIndex &&
-				this.executable.equals(otherParam.executable));
+		return (this == other || (other instanceof MethodParameter that &&
+				getContainingClass() == that.getContainingClass() &&
+				ObjectUtils.nullSafeEquals(this.typeIndexesPerLevel, that.typeIndexesPerLevel) &&
+				this.nestingLevel == that.nestingLevel &&
+				this.parameterIndex == that.parameterIndex &&
+				this.executable.equals(that.executable)));
 	}
 
 	@Override
@@ -780,6 +775,7 @@ public class MethodParameter {
 		return new MethodParameter(this);
 	}
 
+
 	/**
 	 * Create a new MethodParameter for the given method or constructor.
 	 * <p>This is a convenience factory method for scenarios where a
@@ -791,11 +787,11 @@ public class MethodParameter {
 	 */
 	@Deprecated
 	public static MethodParameter forMethodOrConstructor(Object methodOrConstructor, int parameterIndex) {
-		if (!(methodOrConstructor instanceof Executable)) {
+		if (!(methodOrConstructor instanceof Executable executable)) {
 			throw new IllegalArgumentException(
 					"Given object [" + methodOrConstructor + "] is neither a Method nor a Constructor");
 		}
-		return forExecutable((Executable) methodOrConstructor, parameterIndex);
+		return forExecutable(executable, parameterIndex);
 	}
 
 	/**
@@ -808,11 +804,11 @@ public class MethodParameter {
 	 * @since 5.0
 	 */
 	public static MethodParameter forExecutable(Executable executable, int parameterIndex) {
-		if (executable instanceof Method) {
-			return new MethodParameter((Method) executable, parameterIndex);
+		if (executable instanceof Method method) {
+			return new MethodParameter(method, parameterIndex);
 		}
-		else if (executable instanceof Constructor) {
-			return new MethodParameter((Constructor<?>) executable, parameterIndex);
+		else if (executable instanceof Constructor<?> constructor) {
+			return new MethodParameter(constructor, parameterIndex);
 		}
 		else {
 			throw new IllegalArgumentException("Not a Method/Constructor: " + executable);

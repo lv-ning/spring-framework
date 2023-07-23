@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -66,12 +66,12 @@ public abstract class ExchangeFilterFunctions {
 
 	/**
 	 * Return a filter that generates an error signal when the given
-	 * {@link HttpStatus} predicate matches.
+	 * {@link HttpStatusCode} predicate matches.
 	 * @param statusPredicate the predicate to check the HTTP status with
-	 * @param exceptionFunction the function that to create the exception
+	 * @param exceptionFunction the function to create the exception
 	 * @return the filter to generate an error signal
 	 */
-	public static ExchangeFilterFunction statusError(Predicate<HttpStatus> statusPredicate,
+	public static ExchangeFilterFunction statusError(Predicate<HttpStatusCode> statusPredicate,
 			Function<ClientResponse, ? extends Throwable> exceptionFunction) {
 
 		Assert.notNull(statusPredicate, "Predicate must not be null");
@@ -167,18 +167,13 @@ public abstract class ExchangeFilterFunctions {
 
 		@Override
 		public boolean equals(@Nullable Object other) {
-			if (this == other) {
-				return true;
-			}
-			if (!(other instanceof Credentials otherCred)) {
-				return false;
-			}
-			return (this.username.equals(otherCred.username) && this.password.equals(otherCred.password));
+			return (this == other ||(other instanceof Credentials that &&
+					this.username.equals(that.username) && this.password.equals(that.password)));
 		}
 
 		@Override
 		public int hashCode() {
-			return 31 * this.username.hashCode() + this.password.hashCode();
+			return this.username.hashCode() * 31 + this.password.hashCode();
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ class DefaultServerRequest implements ServerRequest {
 
 	public DefaultServerRequest(HttpServletRequest servletRequest, List<HttpMessageConverter<?>> messageConverters) {
 		this.serverHttpRequest = new ServletServerHttpRequest(servletRequest);
-		this.messageConverters = Collections.unmodifiableList(new ArrayList<>(messageConverters));
+		this.messageConverters = List.copyOf(messageConverters);
 
 		this.headers = new DefaultRequestHeaders(this.serverHttpRequest.getHeaders());
 		this.params = CollectionUtils.toMultiValueMap(new ServletParametersMap(servletRequest));
@@ -206,7 +206,7 @@ class DefaultServerRequest implements ServerRequest {
 				return theConverter.read(clazz, this.serverHttpRequest);
 			}
 		}
-		throw new HttpMediaTypeNotSupportedException(contentType, getSupportedMediaTypes(bodyClass));
+		throw new HttpMediaTypeNotSupportedException(contentType, getSupportedMediaTypes(bodyClass), method());
 	}
 
 	private List<MediaType> getSupportedMediaTypes(Class<?> bodyClass) {
@@ -508,12 +508,6 @@ class DefaultServerRequest implements ServerRequest {
 		}
 
 		@Override
-		@Deprecated
-		public void setStatus(int sc, String sm) {
-			this.status = sc;
-		}
-
-		@Override
 		public int getStatus() {
 			return this.status;
 		}
@@ -550,18 +544,6 @@ class DefaultServerRequest implements ServerRequest {
 
 		@Override
 		public String encodeRedirectURL(String url) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		@Deprecated
-		public String encodeUrl(String url) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		@Deprecated
-		public String encodeRedirectUrl(String url) {
 			throw new UnsupportedOperationException();
 		}
 
