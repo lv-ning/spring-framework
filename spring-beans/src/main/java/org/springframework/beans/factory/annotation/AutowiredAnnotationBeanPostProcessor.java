@@ -637,7 +637,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		 * 字段 field 上面加 {@link Autowired} 注解后，执行的方法
 		 */
 		@Override
-		protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
+			protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
 			// 获取当前字段
 			Field field = (Field) this.member;
 			Object value;
