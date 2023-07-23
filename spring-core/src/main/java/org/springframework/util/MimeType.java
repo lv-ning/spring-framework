@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 
 	private final String subtype;
 
+	@SuppressWarnings("serial")
 	private final Map<String, String> parameters;
 
 	@Nullable
@@ -267,7 +268,8 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	 * @return whether the subtype is a wildcard
 	 */
 	public boolean isWildcardSubtype() {
-		return WILDCARD_TYPE.equals(getSubtype()) || getSubtype().startsWith("*+");
+		String subtype = getSubtype();
+		return (WILDCARD_TYPE.equals(subtype) || subtype.startsWith("*+"));
 	}
 
 	/**
@@ -408,7 +410,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 					return (thisSuffix.equals(other.getSubtype()) || thisSuffix.equals(otherSuffix));
 				}
 				else if (other.isWildcardSubtype() && otherSuffix != null) {
-					return (this.getSubtype().equals(otherSuffix) || otherSuffix.equals(thisSuffix));
+					return (getSubtype().equals(otherSuffix) || otherSuffix.equals(thisSuffix));
 				}
 			}
 		}
@@ -449,15 +451,10 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 
 	@Override
 	public boolean equals(@Nullable Object other) {
-		if (this == other) {
-			return true;
-		}
-		if (!(other instanceof MimeType otherType)) {
-			return false;
-		}
-		return (this.type.equalsIgnoreCase(otherType.type) &&
+		return (this == other || (other instanceof MimeType otherType &&
+				this.type.equalsIgnoreCase(otherType.type) &&
 				this.subtype.equalsIgnoreCase(otherType.subtype) &&
-				parametersAreEqual(otherType));
+				parametersAreEqual(otherType)));
 	}
 
 	/**
@@ -707,7 +704,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	 * @param <T> the type of mime types that may be compared by this comparator
 	 * @deprecated As of 6.0, with no direct replacement
 	 */
-	@Deprecated
+	@Deprecated(since = "6.0", forRemoval = true)
 	public static class SpecificityComparator<T extends MimeType> implements Comparator<T> {
 
 		@Override

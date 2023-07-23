@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -53,6 +53,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.cors.reactive.CorsUtils;
 import org.springframework.web.reactive.function.BodyExtractor;
 import org.springframework.web.server.ServerWebExchange;
@@ -72,6 +73,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
 public abstract class RequestPredicates {
 
 	private static final Log logger = LogFactory.getLog(RequestPredicates.class);
+
 
 	/**
 	 * Return a {@code RequestPredicate} that always matches.
@@ -110,10 +112,9 @@ public abstract class RequestPredicates {
 	 */
 	public static RequestPredicate path(String pattern) {
 		Assert.notNull(pattern, "'pattern' must not be null");
-		if (!pattern.isEmpty() && !pattern.startsWith("/")) {
-			pattern = "/" + pattern;
-		}
-		return pathPredicates(PathPatternParser.defaultInstance).apply(pattern);
+		PathPatternParser parser = PathPatternParser.defaultInstance;
+		pattern = parser.initFullPathPattern(pattern);
+		return pathPredicates(parser).apply(pattern);
 	}
 
 	/**
@@ -337,14 +338,14 @@ public abstract class RequestPredicates {
 		void method(Set<HttpMethod> methods);
 
 		/**
-		 * Receive notification of an path predicate.
+		 * Receive notification of a path predicate.
 		 * @param pattern the path pattern that makes up the predicate
 		 * @see RequestPredicates#path(String)
 		 */
 		void path(String pattern);
 
 		/**
-		 * Receive notification of an path extension predicate.
+		 * Receive notification of a path extension predicate.
 		 * @param extension the path extension that makes up the predicate
 		 * @see RequestPredicates#pathExtension(String)
 		 */
@@ -537,7 +538,6 @@ public abstract class RequestPredicates {
 		public String toString() {
 			return this.pattern.getPatternString();
 		}
-
 	}
 
 
@@ -566,12 +566,13 @@ public abstract class RequestPredicates {
 		}
 	}
 
+
 	private static class ContentTypePredicate extends HeadersPredicate {
 
 		private final Set<MediaType> mediaTypes;
 
 		public ContentTypePredicate(MediaType... mediaTypes) {
-			this(new HashSet<>(Arrays.asList(mediaTypes)));
+			this(Set.of(mediaTypes));
 		}
 
 		private ContentTypePredicate(Set<MediaType> mediaTypes) {
@@ -603,12 +604,13 @@ public abstract class RequestPredicates {
 		}
 	}
 
+
 	private static class AcceptPredicate extends HeadersPredicate {
 
 		private final Set<MediaType> mediaTypes;
 
 		public AcceptPredicate(MediaType... mediaTypes) {
-			this(new HashSet<>(Arrays.asList(mediaTypes)));
+			this(Set.of(mediaTypes));
 		}
 
 		private AcceptPredicate(Set<MediaType> mediaTypes) {
@@ -698,7 +700,6 @@ public abstract class RequestPredicates {
 							this.extension :
 							this.extensionPredicate);
 		}
-
 	}
 
 
@@ -795,11 +796,11 @@ public abstract class RequestPredicates {
 
 		@Override
 		public void changeParser(PathPatternParser parser) {
-			if (this.left instanceof ChangePathPatternParserVisitor.Target) {
-				((ChangePathPatternParserVisitor.Target) this.left).changeParser(parser);
+			if (this.left instanceof ChangePathPatternParserVisitor.Target leftTarget) {
+				leftTarget.changeParser(parser);
 			}
-			if (this.right instanceof ChangePathPatternParserVisitor.Target) {
-				((ChangePathPatternParserVisitor.Target) this.right).changeParser(parser);
+			if (this.right instanceof ChangePathPatternParserVisitor.Target rightTarget) {
+				rightTarget.changeParser(parser);
 			}
 		}
 
@@ -808,6 +809,7 @@ public abstract class RequestPredicates {
 			return String.format("(%s && %s)", this.left, this.right);
 		}
 	}
+
 
 	/**
 	 * {@link RequestPredicate} that negates a delegate predicate.
@@ -840,8 +842,8 @@ public abstract class RequestPredicates {
 
 		@Override
 		public void changeParser(PathPatternParser parser) {
-			if (this.delegate instanceof ChangePathPatternParserVisitor.Target) {
-				((ChangePathPatternParserVisitor.Target) this.delegate).changeParser(parser);
+			if (this.delegate instanceof ChangePathPatternParserVisitor.Target target) {
+				target.changeParser(parser);
 			}
 		}
 
@@ -850,6 +852,7 @@ public abstract class RequestPredicates {
 			return "!" + this.delegate.toString();
 		}
 	}
+
 
 	/**
 	 * {@link RequestPredicate} where either {@code left} or {@code right} predicates
@@ -907,11 +910,11 @@ public abstract class RequestPredicates {
 
 		@Override
 		public void changeParser(PathPatternParser parser) {
-			if (this.left instanceof ChangePathPatternParserVisitor.Target) {
-				((ChangePathPatternParserVisitor.Target) this.left).changeParser(parser);
+			if (this.left instanceof ChangePathPatternParserVisitor.Target leftTarget) {
+				leftTarget.changeParser(parser);
 			}
-			if (this.right instanceof ChangePathPatternParserVisitor.Target) {
-				((ChangePathPatternParserVisitor.Target) this.right).changeParser(parser);
+			if (this.right instanceof ChangePathPatternParserVisitor.Target rightTarget) {
+				rightTarget.changeParser(parser);
 			}
 		}
 
@@ -1043,6 +1046,16 @@ public abstract class RequestPredicates {
 		}
 
 		@Override
+		public <T> Mono<T> bind(Class<T> bindType) {
+			return this.request.bind(bindType);
+		}
+
+		@Override
+		public <T> Mono<T> bind(Class<T> bindType, Consumer<WebDataBinder> dataBinderCustomizer) {
+			return this.request.bind(bindType, dataBinderCustomizer);
+		}
+
+		@Override
 		public Map<String, Object> attributes() {
 			return this.attributes;
 		}
@@ -1094,7 +1107,6 @@ public abstract class RequestPredicates {
 		public String toString() {
 			return method() + " " +  path();
 		}
-
 	}
 
 }
