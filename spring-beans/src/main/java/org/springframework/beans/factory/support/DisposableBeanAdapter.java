@@ -185,7 +185,9 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 	@Override
 	public void destroy() {
 		if (!CollectionUtils.isEmpty(this.beanPostProcessors)) {
+			// 获取所有的需要销毁的 BeanPostProcessor
 			for (DestructionAwareBeanPostProcessor processor : this.beanPostProcessors) {
+				// 执行销毁方法
 				processor.postProcessBeforeDestruction(this.bean, this.beanName);
 			}
 		}
