@@ -602,6 +602,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
 		// 为循环依赖做支撑
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
+				// 是否是正在被创建过程中
 				isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
 			if (logger.isTraceEnabled()) {
@@ -630,9 +631,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// 是否允许循环依赖
 		if (earlySingletonExposure) {
+			// 从二级缓存中获取一下
+			// earlySingletonReference = null 说明还没有被其它的依赖上
+			// earlySingletonReference != null 说明已经被其它的依赖上了
 			Object earlySingletonReference = getSingleton(beanName, false);
 			if (earlySingletonReference != null) {
+				/// 一般是相等的，除非 aop
 				if (exposedObject == bean) {
 					exposedObject = earlySingletonReference;
 				} else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
@@ -985,6 +991,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
+					// spring aio 是没有对这个进行扩展的
+					// aop 实现了该接口 AbstractAutoProxyCreator
 					SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;
 					exposedObject = ibp.getEarlyBeanReference(exposedObject, beanName);
 				}

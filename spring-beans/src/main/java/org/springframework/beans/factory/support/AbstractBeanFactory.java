@@ -250,6 +250,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
+		// 三级缓存中获取
 		Object sharedInstance = getSingleton(beanName);
 		// 1，这个 bean 是否已经被创建
 		if (sharedInstance != null && args == null) {
@@ -331,7 +332,6 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					// 创建 bean 并且放到 单例池 singletonObjects 当中
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
-
 							// 创建 bean
 							return createBean(beanName, mbd, args);
 						}
