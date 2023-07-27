@@ -60,6 +60,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 		// This method optimizes avoiding unnecessary creation of ClassReaders
 		// as well as visiting over those readers.
 		// 默认为 false
+		// 匹配自身信息
 		if (matchSelf(metadataReader)) {
 			return true;
 		}
@@ -146,6 +147,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 	 * Override this to match on type name.
 	 */
 	protected boolean matchClassName(String className) {
+		// 匹配类名
 		return false;
 	}
 

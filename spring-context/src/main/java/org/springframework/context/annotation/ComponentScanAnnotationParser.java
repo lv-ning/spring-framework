@@ -75,9 +75,20 @@ class ComponentScanAnnotationParser {
 
 	/**
 	 * 完成扫描
+	 * 解析配置类上面的 @ComponentScan 注解
 	 */
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, String declaringClass) {
 		// 内部扫描器
+		// useDefaultFilters 是否使用默认的过滤器
+		/**
+		 * 1，exclude 排除
+		 * 2，include 引入
+		 *
+		 * scanner doScan
+		 * 1，把所有的类都获取到 asm 字节码文件
+		 * 2，获取到的这些文件能不能编程 BeanDefinition
+		 * 需要进行过滤（假设被 exclude 过滤到，就排除，就不合格，然后判断 include 是否过滤到，过滤到就合格）
+		 */
 		ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this.registry,
 				componentScan.getBoolean("useDefaultFilters"), this.environment, this.resourceLoader);
 
@@ -114,6 +125,7 @@ class ComponentScanAnnotationParser {
 			}
 		}
 
+		// 是否懒加载
 		boolean lazyInit = componentScan.getBoolean("lazyInit");
 		if (lazyInit) {
 			scanner.getBeanDefinitionDefaults().setLazyInit(true);

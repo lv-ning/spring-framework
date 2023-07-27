@@ -94,8 +94,10 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 	private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
 
+	// 需要进入的过滤器
 	private final List<TypeFilter> includeFilters = new ArrayList<>();
 
+	// 需要排除的过滤器
 	private final List<TypeFilter> excludeFilters = new ArrayList<>();
 
 	@Nullable
@@ -419,6 +421,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
+		// 通过包名，获取文件的结对路径
 		try {
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
@@ -432,7 +435,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 				}
 				try {
 					// ASM 字节码获取文件
-					// metadataReader 相当于 class
+					// metadataReader 相当于 class，但是不是类，为的就是不干扰用户的行为
 					MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
 					// 过滤器进行过滤
 					if (isCandidateComponent(metadataReader)) {
