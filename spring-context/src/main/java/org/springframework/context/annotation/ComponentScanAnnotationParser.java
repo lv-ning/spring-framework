@@ -96,6 +96,7 @@ class ComponentScanAnnotationParser {
 		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");
 		// 是否为 默认的名字生成策略
 		boolean useInheritedGenerator = (BeanNameGenerator.class == generatorClass);
+		// 如果注解上存在，使用注解上的
 		scanner.setBeanNameGenerator(useInheritedGenerator ? this.beanNameGenerator :
 				BeanUtils.instantiateClass(generatorClass));
 

@@ -315,10 +315,13 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		if (registry instanceof SingletonBeanRegistry) {
 			sbr = (SingletonBeanRegistry) registry;
 			if (!this.localBeanNameGeneratorSet) {
+				// 获取一个名字生成器
 				BeanNameGenerator generator = (BeanNameGenerator) sbr.getSingleton(
 						AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR);
 				if (generator != null) {
+					// ComponentScan 的名字生成策略
 					this.componentScanBeanNameGenerator = generator;
+					// import 的名字生成策略
 					this.importBeanNameGenerator = generator;
 				}
 			}
@@ -473,6 +476,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 							"is a non-static @Bean method with a BeanDefinitionRegistryPostProcessor " +
 							"return type: Consider declaring such methods as 'static'.");
 				}
+				// 添加到 配置类的 map 当中，一定是 full 配置类
 				configBeanDefs.put(beanName, (AbstractBeanDefinition) beanDef);
 			}
 		}

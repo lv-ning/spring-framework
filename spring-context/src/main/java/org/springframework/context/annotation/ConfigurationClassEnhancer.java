@@ -110,6 +110,7 @@ class ConfigurationClassEnhancer {
 			}
 			return configClass;
 		}
+		// 创建增强其
 		Class<?> enhancedClass = createClass(newEnhancer(configClass, classLoader));
 		if (logger.isTraceEnabled()) {
 			logger.trace(String.format("Successfully enhanced %s; enhanced class name is: %s",
@@ -204,7 +205,8 @@ class ConfigurationClassEnhancer {
 				Callback callback = this.callbacks[i];
 				// 过滤
 				// 前两个 都是 ConditionalCallback
-				if (!(callback instanceof ConditionalCallback) || ((ConditionalCallback) callback).isMatch(method)) {
+				if (!(callback instanceof ConditionalCallback) ||
+						((ConditionalCallback) callback).isMatch(method)) {
 					return i;
 				}
 			}
@@ -254,6 +256,7 @@ class ConfigurationClassEnhancer {
 		@Override
 		@Nullable
 		public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+			// $$beanFactory 属性
 			Field field = ReflectionUtils.findField(obj.getClass(), BEAN_FACTORY_FIELD);
 			Assert.state(field != null, "Unable to find generated BeanFactory field");
 			field.set(obj, args[0]);
@@ -377,6 +380,7 @@ class ConfigurationClassEnhancer {
 						}
 					}
 				}
+				// beanFactory 获取 bean
 				Object beanInstance = (useArgs ? beanFactory.getBean(beanName, beanMethodArgs) :
 						beanFactory.getBean(beanName));
 				if (!ClassUtils.isAssignableValue(beanMethod.getReturnType(), beanInstance)) {
@@ -421,8 +425,9 @@ class ConfigurationClassEnhancer {
 
 		@Override
 		public boolean isMatch(Method candidateMethod) {
+			// 不是 Object 犯法
 			return (candidateMethod.getDeclaringClass() != Object.class &&
-					// setBeanFactory 方法
+					// 不是 setBeanFactory 方法
 					!BeanFactoryAwareMethodInterceptor.isSetBeanFactory(candidateMethod) &&
 					// 加了 Bean 注解
 					BeanAnnotationHelper.isBeanAnnotated(candidateMethod));
@@ -462,6 +467,7 @@ class ConfigurationClassEnhancer {
 		 * to happen on Groovy classes).
 		 */
 		private boolean isCurrentlyInvokedFactoryMethod(Method method) {
+			// ThreadLocal 中获取
 			Method currentlyInvoked = SimpleInstantiationStrategy.getCurrentlyInvokedFactoryMethod();
 			return (currentlyInvoked != null && method.getName().equals(currentlyInvoked.getName()) &&
 					Arrays.equals(method.getParameterTypes(), currentlyInvoked.getParameterTypes()));

@@ -1217,6 +1217,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// 工厂方法
 		if (mbd.getFactoryMethodName() != null) {
+			// @Bean 一般是这个方式实例化的
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
@@ -1471,6 +1472,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				// AutowiredAnnotationBeanPostProcessor 和 CommonAnnotationBeanPostProcessor 都实现了这个接口
+				// ConfigurationClassPostProcessor 下的 ImportAwareBeanPostProcessor 实现了该方法，
+				// 主要完成 @Configuration 注解下的 full 配置类的增强 setBeanFactory 进行设置 beanFactory
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
 					// 完成属性注入
