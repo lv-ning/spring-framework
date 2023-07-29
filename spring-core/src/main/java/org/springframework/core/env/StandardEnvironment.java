@@ -79,7 +79,6 @@ public class StandardEnvironment extends AbstractEnvironment {
 		// 因为这个方法没有重写构造方法
 		// 所以构造该对象的时候会调用父类的构造方法
 
-
 		// jvm 一些信息
 		propertySources.addLast(
 				new PropertiesPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, getSystemProperties()));

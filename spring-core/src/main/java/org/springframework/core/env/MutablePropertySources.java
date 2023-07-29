@@ -42,6 +42,7 @@ import org.springframework.lang.Nullable;
 public class MutablePropertySources implements PropertySources {
 
 	// PropertySource systemEnvironment systemProperties
+	// 所有的环境变量都放到这里面
 	private final List<PropertySource<?>> propertySourceList = new CopyOnWriteArrayList<>();
 
 

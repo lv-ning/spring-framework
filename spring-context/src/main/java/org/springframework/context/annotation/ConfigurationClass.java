@@ -49,11 +49,15 @@ import org.springframework.util.ClassUtils;
  * 配置类
  * 用来描述我们的自己创建的配置类
  * 用于抽象配置类的
+ *
+ * 用于抽象类信息
  */
 final class ConfigurationClass {
 
+	// 注解信息
 	private final AnnotationMetadata metadata;
 
+	// asm 字节码 资源信息
 	private final Resource resource;
 
 	@Nullable
