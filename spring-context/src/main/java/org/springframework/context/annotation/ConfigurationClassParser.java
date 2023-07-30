@@ -351,6 +351,7 @@ class ConfigurationClassParser {
 		// Process individual @Bean methods
 		Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(sourceClass);
 		for (MethodMetadata methodMetadata : beanMethods) {
+			// 放到 ConfigurationClass 的 beanMethods 集合中国
 			configClass.addBeanMethod(new BeanMethod(methodMetadata, configClass));
 		}
 

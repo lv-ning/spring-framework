@@ -361,35 +361,47 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			}
 			// 加载BeanDefinition 到 beanDefinitionMap 当中
 			// 这里可能 registry 一个新的
+			// ImportBeanDefinitionRegistrars 可能会动态注册新的
 			this.reader.loadBeanDefinitions(configClasses);
+			// 添加到处理完成的 集合中
 			alreadyParsed.addAll(configClasses);
 
-			// 空的
+			// 配置类清除
 			candidates.clear();
-			// beanDefinitionMap 的个数
+
+			// 下面的代表表示 ImportBeanDefinitionRegistrars 里面的类可以当作配置类继续解析配置
+
+			// registry.getBeanDefinitionCount() beanDefinitionMap 的个数
+			// candidateNames.length 老的 存在的 beanDefinition 数量
 			if (registry.getBeanDefinitionCount() > candidateNames.length) {
-				// 获取最新的 beanDefinitionMap 的名字
+				// 获取全部的 beanDefinitionMap 的名字
 				String[] newCandidateNames = registry.getBeanDefinitionNames();
-				// 老的
+				// 老的 beanDefinitionMap 的名字
 				Set<String> oldCandidateNames = new HashSet<>(Arrays.asList(candidateNames));
 				// 所有已经解析成了配置类的集合
 				Set<String> alreadyParsedClasses = new HashSet<>();
+				// 将所有已经解析的配置类 放到 alreadyParsedClasses 集合中
 				for (ConfigurationClass configurationClass : alreadyParsed) {
 					alreadyParsedClasses.add(configurationClass.getMetadata().getClassName());
 				}
-				// 遍历新的
+				// 遍历全部的
 				for (String candidateName : newCandidateNames) {
 					// 判断老的是否包含
+					// 不包含
 					if (!oldCandidateNames.contains(candidateName)) {
+						// 获取新的 beanDefinition
 						BeanDefinition bd = registry.getBeanDefinition(candidateName);
-						// 如果还有没有解析的
+						// 判断是否为配置类，并且做标记 full lite
 						if (ConfigurationClassUtils.checkConfigurationClassCandidate(bd, this.metadataReaderFactory) &&
+								// 没有被解析过的
 								!alreadyParsedClasses.contains(bd.getBeanClassName())) {
 							// 加入新的需要解析的
+							// 再次递归进行解析
 							candidates.add(new BeanDefinitionHolder(bd, candidateName));
 						}
 					}
 				}
+				// 将上次获取的全部的信息替换
 				candidateNames = newCandidateNames;
 			}
 		}

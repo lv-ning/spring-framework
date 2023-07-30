@@ -139,10 +139,13 @@ class ConfigurationClassBeanDefinitionReader {
 
 		// 是否被 import 进来的
 		if (configClass.isImported()) {
+			// 被 import 进来的
+			// 会变成 BeanDefinition 并且放到 beanDefinitionMap 当中
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
-		// @Bean 进来的
+		// 遍历 @Bean 进来的
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
+			// 会变成 BeanDefinition 并且放到 beanDefinitionMap 当中
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
@@ -227,6 +230,7 @@ class ConfigurationClassBeanDefinitionReader {
 		ConfigurationClassBeanDefinition beanDef = new ConfigurationClassBeanDefinition(configClass, metadata, beanName);
 		beanDef.setSource(this.sourceExtractor.extractSource(metadata, configClass.getResource()));
 
+		// 静态的
 		if (metadata.isStatic()) {
 			// static @Bean method
 			if (configClass.getMetadata() instanceof StandardAnnotationMetadata) {
