@@ -246,14 +246,17 @@ final class PostProcessorRegistrationDelegate {
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
-		// 单例池中获取 BeanPostProcessor
+		// 单例池中获取 BeanPostProcessor AutowiredAnnotationBeanPostProcessor CommonAnnotationBeanPostProcessor
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when
 		// a bean is created during BeanPostProcessor instantiation, i.e. when
 		// a bean is not eligible for getting processed by all BeanPostProcessors.
 		// 添加一个检查的 beanPostProcessor，用于检查 bean 是否走完了所有的 beanPostProcessor
+		// 目标期望的数量 beanProcessorTargetCount
+		// getBeanPostProcessorCount 内部的 ApplicationContextAwareProcessor ApplicationListenerDetector ImportAwareBeanPostProcessor
 		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
+		// 增加一个 check
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
 
 		// Separate between BeanPostProcessors that implement PriorityOrdered,
