@@ -82,6 +82,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	 * List of MethodInterceptor and InterceptorAndDynamicMethodMatcher
 	 * that need dynamic checks.
 	 */
+	// = chain
 	protected final List<?> interceptorsAndDynamicMethodMatchers;
 
 	/**
@@ -187,6 +188,8 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		} else {
 			// It's an interceptor, so we just invoke it: The pointcut will have
 			// been evaluated statically before this object was constructed.
+			// 执行方法的 invoke 方法
+			// 将 this 传过去是为了执行下一个 chain
 			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
 		}
 	}
@@ -200,6 +203,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	 */
 	@Nullable
 	protected Object invokeJoinpoint() throws Throwable {
+		// 反射执行
 		return AopUtils.invokeJoinpointUsingReflection(this.target, this.method, this.arguments);
 	}
 
