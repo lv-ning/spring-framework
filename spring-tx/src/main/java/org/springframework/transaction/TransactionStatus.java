@@ -49,6 +49,7 @@ public interface TransactionStatus extends TransactionExecution, SavepointManage
 	 * @see #rollbackToSavepoint(Object)
 	 * @see #releaseSavepoint(Object)
 	 */
+	// 回滚吊
 	boolean hasSavepoint();
 
 	/**
@@ -59,6 +60,7 @@ public interface TransactionStatus extends TransactionExecution, SavepointManage
 	 * get applied to the primary resource or to transaction synchronizations,
 	 * depending on the underlying resource.
 	 */
+	// 缓存刷新
 	@Override
 	void flush();
 

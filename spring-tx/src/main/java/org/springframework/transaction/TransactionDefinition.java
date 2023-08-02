@@ -200,6 +200,7 @@ public interface TransactionDefinition {
 	 * @see #PROPAGATION_REQUIRED
 	 * @see org.springframework.transaction.support.TransactionSynchronizationManager#isActualTransactionActive()
 	 */
+	// 获取传播特性
 	default int getPropagationBehavior() {
 		return PROPAGATION_REQUIRED;
 	}
@@ -222,6 +223,7 @@ public interface TransactionDefinition {
 	 * @see #ISOLATION_DEFAULT
 	 * @see org.springframework.transaction.support.AbstractPlatformTransactionManager#setValidateExistingTransaction
 	 */
+	// 获取隔离级别
 	default int getIsolationLevel() {
 		return ISOLATION_DEFAULT;
 	}
@@ -237,6 +239,7 @@ public interface TransactionDefinition {
 	 * <p>The default is {@link #TIMEOUT_DEFAULT}.
 	 * @return the transaction timeout
 	 */
+	// 超市时间
 	default int getTimeout() {
 		return TIMEOUT_DEFAULT;
 	}
@@ -258,6 +261,7 @@ public interface TransactionDefinition {
 	 * @see org.springframework.transaction.support.TransactionSynchronization#beforeCommit(boolean)
 	 * @see org.springframework.transaction.support.TransactionSynchronizationManager#isCurrentTransactionReadOnly()
 	 */
+	// 只读事务
 	default boolean isReadOnly() {
 		return false;
 	}
@@ -272,6 +276,7 @@ public interface TransactionDefinition {
 	 * @see org.springframework.transaction.interceptor.TransactionAspectSupport
 	 * @see org.springframework.transaction.support.TransactionSynchronizationManager#getCurrentTransactionName()
 	 */
+	// 名字
 	@Nullable
 	default String getName() {
 		return null;
