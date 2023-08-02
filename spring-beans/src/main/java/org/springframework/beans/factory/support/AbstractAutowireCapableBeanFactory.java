@@ -1443,6 +1443,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// 相当于 map
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
 		// 自动注入模型
@@ -1560,7 +1561,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// 自动注入 bean 名称
 		Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
-		// 需要自动注入的属性名字 @Autowired
+		// 需要自动注入的属性名字
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		for (String propertyName : propertyNames) {
 			try {

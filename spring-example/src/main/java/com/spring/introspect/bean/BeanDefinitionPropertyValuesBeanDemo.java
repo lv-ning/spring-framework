@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
  * @author nning_l@163.com
  * @since 2022-07-28
  */
-@Component
+//@Component
 public class BeanDefinitionPropertyValuesBeanDemo {
 }

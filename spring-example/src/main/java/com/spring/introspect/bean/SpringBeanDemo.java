@@ -35,6 +35,9 @@ public class SpringBeanDemo {
 		log.debug("自动注入 ： {}", autowiredInjectByTypeMethodBeanDemo);
 	}
 
+	/**
+	 * beanDefinition getPropertyValues 方法设置
+	 */
 	public void setBeanDefinitionPropertyValuesBeanDemo(BeanDefinitionPropertyValuesBeanDemo beanDefinitionPropertyValuesBeanDemo) {
 		log.debug("bean definition 注入 : {}", beanDefinitionPropertyValuesBeanDemo);
 	}
